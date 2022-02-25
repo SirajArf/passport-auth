@@ -22,7 +22,8 @@ const port = process.env.PORT || 5000;
 
 const app = express();
 
-//app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 //logging
 
@@ -30,8 +31,20 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+const { formatDate, stripTags, truncate, editIcon } = require("./helpers/helpers");
+
 //handlebars
-app.engine(".hbs", exphbs.engine({ defaultLayout: "main", extname: ".hbs" }));
+app.engine(
+  ".hbs",
+  exphbs.engine({
+    helpers: { formatDate,
+                stripTags,
+                truncate,
+                editIcon },
+    defaultLayout: "main",
+    extname: ".hbs",
+  })
+);
 app.set("view engine", ".hbs");
 
 //session middleware
@@ -47,6 +60,11 @@ app.use(
 //passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use(function (req, res, next) {
+    res.locals.user = req.user || null
+    next()
+})
 
 //Static folder
 app.use(express.static(path.join(__dirname, "public")));
