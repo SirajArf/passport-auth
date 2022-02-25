@@ -55,6 +55,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", routes);
 app.use("/auth", require("./routes/auth"));
+app.use("/stories", require("./routes/stories"));
 
 app.listen(port, (req, res) => {
   console.log(`server is in ${process.env.NODE_ENV} running at ${port}`);
