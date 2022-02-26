@@ -81,5 +81,67 @@ router.put('/:id', ensureAuth, async (req, res) => {
     return res.render('error/serverError')
   }
 })
+router.delete('/:id', ensureAuth, async (req, res) => {
+  try {
+    let story = await Story.findById(req.params.id).lean()
+
+    if (!story) {
+      return res.render('error/notFound')
+    }
+
+    if (story.user != req.user.id) {
+      res.redirect('/stories')
+    } else {
+      await Story.remove({ _id: req.params.id })
+      res.redirect('/dashboard')
+    }
+  } catch (err) {
+    console.error(err)
+    return res.render('error/serverError')
+  }
+})
+
+router.get('/:id', ensureAuth, async (req, res) => {
+  try {
+    let story = await Story.findById(req.params.id).populate('user').lean()
+
+    if (!story) {
+      return res.render('error/notFound')
+    }
+
+    if (story.user._id != req.user.id && story.status == 'private') {
+      res.render('error/notFound')
+    } else {
+      res.render('stories/show', {
+        story,
+      })
+    }
+  } catch (err) {
+    console.error(err)
+    res.render('error/serverError')
+  }
+})
+
+router.get('/user/:userId', ensureAuth, async (req, res) => {
+  try {
+    const stories = await Story.find({
+      user: req.params.userId,
+      status: 'public',
+    })
+      .populate('user')
+      .lean()
+
+    res.render('stories/index', {
+      stories,
+    })
+  } catch (err) {
+    console.error(err)
+    res.render('error/500')
+  }
+})
+
+
+
+
 
 module.exports = router;
