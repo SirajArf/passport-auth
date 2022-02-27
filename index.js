@@ -46,19 +46,17 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-const {
-  formatDate,
-  stripTags,
-  truncate,
-  editIcon,
-  select,
-} = require("./helpers/helpers");
+
+const { formatDate } = require('./helpers/dateFormat_utill')
+const { ReduceStory } = require('./helpers/string_utill')
+const { stripTags, selectOptions } = require('./helpers/html_utill')
+const { editIcon } = require('./helpers/editIcon_utill')
 
 //handlebars
 app.engine(
   ".hbs",
   exphbs.engine({
-    helpers: { formatDate, stripTags, truncate, editIcon, select },
+    helpers: { formatDate, stripTags, ReduceStory, editIcon, selectOptions },
     defaultLayout: "main",
     extname: ".hbs",
   })
